@@ -4,7 +4,10 @@ services:
   market-integration-service:
     build:
       context: .
-      dockerfile: market-integration-service/Dockerfile
+      dockerfile: Dockerfile
+      target: market-integration-service
+    ports:
+      - "50052:50052"
     environment:
       - PORT=50052
       - FINNHUB_API_KEY=${FINNHUB_API_KEY:-}
@@ -13,7 +16,10 @@ services:
   market-service:
     build:
       context: .
-      dockerfile: market-service/Dockerfile
+      dockerfile: Dockerfile
+      target: market-service
+    ports:
+      - "50051:50051"
     environment:
       - PORT=50051
       - MARKET_INTEGRATION_URL=http://market-integration-service:50052
@@ -24,7 +30,10 @@ services:
   audit-service:
     build:
       context: .
-      dockerfile: audit-service/Dockerfile
+      dockerfile: Dockerfile
+      target: audit-service
+    ports:
+      - "50054:50054"
     environment:
       - PORT=50054
       - REDIS_URL=${REDIS_URL}
@@ -33,7 +42,10 @@ services:
   portfolio-service:
     build:
       context: .
-      dockerfile: portfolio-service/Dockerfile
+      dockerfile: Dockerfile
+      target: portfolio-service
+    ports:
+      - "50053:50053"
     environment:
       - PORT=50053
       - MARKET_URL=http://market-service:50051
@@ -47,7 +59,10 @@ services:
   api-gateway:
     build:
       context: .
-      dockerfile: api-gateway/Dockerfile
+      dockerfile: Dockerfile
+      target: api-gateway
+    ports:
+      - "8080:8080"
     environment:
       - PORT=8080
       - MARKET_URL=http://market-service:50051
