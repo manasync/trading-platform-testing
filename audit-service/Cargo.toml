@@ -1,0 +1,17 @@
+[package]
+name = "audit-service"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tokio = { version = "1.35", features = ["full"] }
+tonic = "0.11"
+prost = "0.12"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+redis = { version = "0.24", features = ["tokio-comp"] }
+chrono = { version = "0.4", features = ["serde"] }
+dotenvy = "0.15"
+
+[build-dependencies]
+tonic-build = "0.11"

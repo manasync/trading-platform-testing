@@ -1,0 +1,16 @@
+[package]
+name = "market-service"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tokio = { version = "1.35", features = ["full"] }
+tonic = "0.11"
+prost = "0.12"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+dotenvy = "0.15"
+rand = "0.8"
+
+[build-dependencies]
+tonic-build = "0.11"

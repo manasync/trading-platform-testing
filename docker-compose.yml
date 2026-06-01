@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  market-integration-service:
+    build:
+      context: .
+      dockerfile: market-integration-service/Dockerfile
+    environment:
+      - PORT=50052
+      - FINNHUB_API_KEY=${FINNHUB_API_KEY:-}
+    restart: always
+
+  market-service:
+    build:
+      context: .
+      dockerfile: market-service/Dockerfile
+    environment:
+      - PORT=50051
+      - MARKET_INTEGRATION_URL=http://market-integration-service:50052
+    depends_on:
+      - market-integration-service
+    restart: always
+
+  audit-service:
+    build:
+      context: .
+      dockerfile: audit-service/Dockerfile
+    environment:
+      - PORT=50054
+      - REDIS_URL=${REDIS_URL}
+    restart: always
+
+  portfolio-service:
+    build:
+      context: .
+      dockerfile: portfolio-service/Dockerfile
+    environment:
+      - PORT=50053
+      - MARKET_URL=http://market-service:50051
+      - AUDIT_URL=http://audit-service:50054
+      - DATABASE_URL=${DATABASE_URL}
+    depends_on:
+      - market-service
+      - audit-service
+    restart: always
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
+    environment:
+      - PORT=8080
+      - MARKET_URL=http://market-service:50051
+      - PORTFOLIO_URL=http://portfolio-service:50053
+    depends_on:
+      - market-service
+      - portfolio-service
+    restart: always

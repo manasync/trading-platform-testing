@@ -1,0 +1,105 @@
+syntax = "proto3";
+
+package exchange;
+
+// Market Service definition
+service MarketService {
+  rpc GetSymbols (GetSymbolsRequest) returns (GetSymbolsResponse);
+  rpc GetPrices (GetPricesRequest) returns (GetPricesResponse);
+  rpc GetPrice (GetPriceRequest) returns (GetPriceResponse);
+}
+
+message GetSymbolsRequest {}
+
+message GetSymbolsResponse {
+  repeated string symbols = 1;
+}
+
+message GetPricesRequest {}
+
+message GetPricesResponse {
+  map<string, double> prices = 1;
+}
+
+message GetPriceRequest {
+  string symbol = 1;
+}
+
+message GetPriceResponse {
+  string symbol = 1;
+  double price = 2;
+  bool success = 3;
+  string error_message = 4;
+}
+
+// Market Integration Service definition (Finnhub connection)
+service MarketIntegrationService {
+  rpc GetFinnhubPrice (GetPriceRequest) returns (GetPriceResponse);
+}
+
+// Portfolio Service definition
+service PortfolioService {
+  rpc GetPortfolio (GetPortfolioRequest) returns (GetPortfolioResponse);
+  rpc CreateOrder (CreateOrderRequest) returns (CreateOrderResponse);
+  rpc GetOrder (GetOrderRequest) returns (GetOrderResponse);
+}
+
+message GetPortfolioRequest {
+  string user_id = 1;
+}
+
+message GetPortfolioResponse {
+  string user_id = 1;
+  double balance = 2;
+  map<string, double> holdings = 3;
+}
+
+message CreateOrderRequest {
+  string user_id = 1;
+  string order_type = 2; // "BUY" or "SELL"
+  string symbol = 3;
+  double quantity = 4;
+}
+
+message CreateOrderResponse {
+  string order_id = 1;
+  string user_id = 2;
+  string order_type = 3;
+  string symbol = 4;
+  double quantity = 5;
+  double price = 6;
+  string status = 7; // "EXECUTED", "REJECTED"
+  string reason = 8;
+  string created_at = 9;
+}
+
+message GetOrderRequest {
+  string order_id = 1;
+}
+
+message GetOrderResponse {
+  string order_id = 1;
+  string user_id = 2;
+  string order_type = 3;
+  string symbol = 4;
+  double quantity = 5;
+  double price = 6;
+  string status = 7;
+  string reason = 8;
+  string created_at = 9;
+}
+
+// Audit Service definition
+service AuditService {
+  rpc LogEvent (LogEventRequest) returns (LogEventResponse);
+}
+
+message LogEventRequest {
+  string event_type = 1; // "ORDER_CREATED", "ORDER_EXECUTED", "ORDER_REJECTED"
+  string order_id = 2;
+  string payload = 3; // JSON or text details
+}
+
+message LogEventResponse {
+  bool success = 1;
+}
