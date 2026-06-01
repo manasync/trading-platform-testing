@@ -6,11 +6,11 @@ services:
       context: .
       dockerfile: Dockerfile
       target: market-integration-service
-    ports:
-      - "50052:50052"
     environment:
       - PORT=50052
       - FINNHUB_API_KEY=${FINNHUB_API_KEY:-}
+    networks:
+      - exchange-network
     restart: always
 
   market-service:
@@ -18,13 +18,13 @@ services:
       context: .
       dockerfile: Dockerfile
       target: market-service
-    ports:
-      - "50051:50051"
     environment:
       - PORT=50051
       - MARKET_INTEGRATION_URL=http://market-integration-service:50052
     depends_on:
       - market-integration-service
+    networks:
+      - exchange-network
     restart: always
 
   audit-service:
@@ -32,11 +32,11 @@ services:
       context: .
       dockerfile: Dockerfile
       target: audit-service
-    ports:
-      - "50054:50054"
     environment:
       - PORT=50054
       - REDIS_URL=${REDIS_URL}
+    networks:
+      - exchange-network
     restart: always
 
   portfolio-service:
@@ -44,8 +44,6 @@ services:
       context: .
       dockerfile: Dockerfile
       target: portfolio-service
-    ports:
-      - "50053:50053"
     environment:
       - PORT=50053
       - MARKET_URL=http://market-service:50051
@@ -54,6 +52,8 @@ services:
     depends_on:
       - market-service
       - audit-service
+    networks:
+      - exchange-network
     restart: always
 
   api-gateway:
@@ -70,4 +70,10 @@ services:
     depends_on:
       - market-service
       - portfolio-service
+    networks:
+      - exchange-network
     restart: always
+
+networks:
+  exchange-network:
+    driver: bridge
